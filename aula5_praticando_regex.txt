@@ -1,0 +1,172 @@
+# Para encontrar um valor exato basta digitar de forma exata na busca regex(f9) o que deve ser buscado.
+Olá :), sou uma frase simples.
+
+# Trabalhar com números.
+# Para buscar algo exato basta digitar de forma exata, para encontar um número(dígito) desconhecido usa-se o 
+\d.
+Ex: \d, \d23, 1\d3.
+
+dev123com
+developer 123
+dev = 1234
+dev = 1337
+dev = 9000
+
+# O ponto(.). Usado quando não se sabe o tipo de caracter a ser pesquisado.
+Ex: ... -> Irá buscar três caracteres em sequência, independente do seu tipo.
+Ex: \., ..\...
+
+asd.
+112.
+1@#.
+12.234
+
+18.335.346
+23.235.756
+56.863.623
+
+# Colchetes, [], para ser mais específico.
+# Agora quero todas as palavras com 3 caracteres no total, que iniciam com o ou a, não importando o caractere
+do meio, e finalizam com a letra a.
+opa
+outra
+ata
+ola
+tola
+puxar
+-> [oa].[a]
+
+# Vamos imaginar o caso de um número de celular, ou qualquer outro padrão onde você quer confirmar uma 
+combinação válida com o número a seguir:
+(23)99255-1231
+-> [(]\d\d[)]\d\d\d\d\d[-]\d\d\d\d
+
+# E o número a seguir? Vamos pensar agora que seu programa estará cadastrando apenas clientes nacionais e
+por isso serão aceitos apenas números com o DDI 55 além do padrão numérico válido. Como poderíamos fazer 
+isso?
+55(23)99200-8755
+45(23)99200-8755
+33(23)99200-8755
+-> [5][5][(]\d\d[)]\d\d\d\d\d[-]\d\d\d\d
+
+hey encontar
+tey encontar
+vei encontar
+way pular
+-> [^w] -> Qualquer caractere exceto w.
+-> [^v] -> Qualquer caractere exceto v.
+
+(55)1234-1235 encontar
+(62)1234-1235 encontar
+(47)1234-1235 pular
+(89)1234-1235 pular
+-> [(][^5][^5][)]
+
+# Em alguns casos você terá que validar valores dentro de uma faixa. Para evitar digitar todos eles 
+individualmente 123456789...
+Quero todos os números de 5 a 9:
+-> [5-9]
+Quero todas as letras entre t e z, abcdefghijklmnopqrstuvwxyz:
+-> [t-z]
+
+# Uma sacada legal para casos onde você estará recebendo letras e números(sem caracteres latinos) é o uso do 
+\w que representa todas as letras de a a z maiúsculas ou minúsculas e números de 0 a 9:
+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"!@#$%¨&*()`´^~"''
+
+# Encontrar repetições de um número mais rapidamente.
+45-8888-88888
+-> \d{5}
+-> \d{4,5}
+-> 8{5}
+
+# Vamos imaginar que estamos criando um filtro de gírias aceitáveis dentro de nossa aplicação. Sendo as únicas
+combinações aceitáveis: 'zoeira', 'zueira', 'zuera', ou seja, apenas quando a palavra é iniciada com uma das 
+três primeiras letras: 'zoei', 'zoe' ou 'zue'.
+zoeira encontrar
+zueira encontar
+zuera encontar
+suera pular
+-> [zueo]{3}
+
+# Em outra situação na qual você quer validar uma quantidade específica de caracteres usados em suas aplicações
+é possível combinar o poder do generalismo com o poder das repetições que as chaves te passam.
+Vamos imaginar que uma senha precisa ter no mínimo 8 caracteres independente de seu tipo.
+12314567
+asdfgdfh
+*&@%$&$%
+G4D%&264
+çéç$"#$
+asdasd
+asdasd
+123 
+-> .{8}
+
+# Uma ou mais repetições: Para todos os caracteres e metacaracteres, podemos usar + para encontar combinações 
+somente quando houver, no mínimo, uma ou mais ocorrências:
+deev encontrar
+ddev encontar 
+dddeva encontrar
+devi encontrar
+eve pular
+-> d+
+
+# Podemos também encontar combinações onde é iniciado de alguma forma e o restante pode ser qualquer combinação
+de caractere usando o .*:
+devi encontrar
+devo enconrtar
+devu encontrar
+deva encontrar
+devi olhar 
+-> dev.*
+-> .*trar
+
+# Em alguns casos você estará lidando com caracteres opcionais, que podem ser econtrados através do 
+metacaractere ?(interrogação) que representa que um caractere é opcional. Ele te permite representar o zero,
+outro caractere ou grupo precedente. Por exemplo em "dados" será encontrado tanto "dados" quanto "dado".
+Porém, caso você precise encontrar o ponto de interrogação, deverá escapá-lo, \?.
+5 arquivos baixados
+1 arquivo baixado
+3 arquivos baixados
+-> arquivos? baixados?
+
+# Espaço em branco: Emdiversos cenários onde você está lidando com entrada de dados de usuário ou em qualquer 
+aplicação usada no mundo real, será necessário lidar com espaços em branco. Devemos ser conscientes dos espaços
+em branco para evitar que nossas expressões regulares não funcionem.
+* espaço: Apertar espaço
+* tab (\t): Encontrar tab(identação/4 espaços)
+* nova linha (\n): Quebra de linha.
+* botão enter (\r): Localiza criação de nova linha criada ao teclar enter(o VSCode não identifica essa função)
+* Para lidar com qualquer tipo de espaço em branco (\s).
+
+1. olá
+2.  olá
+3.      olá
+4.olá
+-> \d\.\s+olá
+
+# Declarando início e fim: Para que você crie um regex mais preciso possível podemos usar os delimitadores de
+início e fim do que deve ser encontrado. Isso é possível usando o ^(acento circunflexo) e o $(dólar).
+Hora de codar
+Tá na hora de codar
+Já chegou a hora de codar
+-> ^hora de codar$
+
+# Capturando grupos: Com o uso de parêntesis.
+Qualquer padrão encontrado dentro desses parêntesis serão colocados em um grupo que poderá ser utilizado 
+posteriormente, isso pode ser útil para extrair números de telefone ou e-mails por exemplo.
+imagem_s121fa.jpg
+imagem_FFDD.jpg
+relatorio_agosto.pdf
+-> (imagem.+\.)(jpg)
+
+# Capturar um sub-grupo.
+-> ((imagem.+\.)(jpg))
+
+amanda@hotmail.com
+jeff@outlook.com
+carol@gmail.com.br
+-> (\w+)(@\w+\.)(com\.br|com)
+
+(33)99200-1885
+-> ([(]\d{2}[)])(\d{5})([-])(\d{4})
+-> (([(]\d{2}[)])(\d{5})([-])(\d{4}))
